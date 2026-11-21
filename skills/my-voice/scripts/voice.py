@@ -180,8 +180,11 @@ def cmd_speak(args):
         lst = tmp / "list.txt"
         lst.write_text("".join(f"file '{p.as_posix()}'\n" for p in listing), encoding="utf-8")
         codec = ["-c:a", "libmp3lame", "-b:a", "192k"] if out.suffix.lower() == ".mp3" else []
+        if not 0.5 <= args.speed <= 2.0:
+            die("--speed must be between 0.5 and 2.0")
+        # atempo speeds up speech without changing pitch (voice stays the same)
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i",
-                        str(lst), *codec, str(out)], check=True)
+                        str(lst), "-af", f"atempo={args.speed}", *codec, str(out)], check=True)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     print(f"Saved: {out.resolve()}")
@@ -205,7 +208,9 @@ def main():
     s = sub.add_parser("speak", help="script -> audio")
     s.add_argument("--in", dest="infile", required=True)
     s.add_argument("--out")
-    s.add_argument("--pause", type=float, default=0.3, help="seconds between sentences")
+    s.add_argument("--pause", type=float, default=0.25, help="seconds between sentences")
+    s.add_argument("--speed", type=float, default=1.2,
+                   help="speaking speed, 1.0 = original, 1.2 = 20%% faster (default), max 2.0")
     s.set_defaults(fn=cmd_speak)
 
     args = p.parse_args()

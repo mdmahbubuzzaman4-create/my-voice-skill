@@ -39,7 +39,10 @@ bad output (garbled words or long nonsense audio).
 3. Report the file path and its duration
    (`ffprobe -v error -show_entries format=duration -of csv=p=0 script.mp3`).
 
-Options: `--pause 0.5` gives longer gaps between sentences (default 0.3 s).
+Options:
+- `--speed 1.2` speaking speed (default 1.2 = 20% faster than the raw model, pitch unchanged).
+  If the user says it is too slow, use 1.3–1.4; too fast, use 1.1 or 1.0.
+- `--pause 0.5` gives longer gaps between sentences (default 0.25 s).
 
 ## Problems
 
